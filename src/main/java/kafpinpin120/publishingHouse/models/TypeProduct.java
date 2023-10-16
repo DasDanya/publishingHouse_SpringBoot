@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Range;
+
+import java.util.List;
+
 
 @Entity
 @Data
@@ -18,7 +20,7 @@ public class TypeProduct {
 
     @Column(nullable = false)
     @NotBlank
-    @Size(min = 5, max = 20, message = "Длина типа продукции не входит в диапазон от 5 до 20 символов")
+    @Size(min = 5, max = 20, message = "Длина наименования типа продукции не входит в диапазон от 5 до 20 символов")
     @Pattern(regexp = "^[А-Яа-я ]+$", message = "Тип продукции должен состоять из русских букв")
     private String type;
 
@@ -27,4 +29,6 @@ public class TypeProduct {
     @DecimalMax(value = "1000.00", message = "Максимальный процент = 1000")
     private double margin;
 
+    @OneToMany(mappedBy = "typeProduct")
+    private List<Product> products;
 }
