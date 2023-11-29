@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -58,4 +60,6 @@ public class PrintingHouse {
     private String house;
 
 
+    @OneToMany(mappedBy = "printingHouse")
+    private List<Booking> bookings;
 }

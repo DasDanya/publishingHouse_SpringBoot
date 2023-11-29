@@ -19,12 +19,14 @@ public class UserDetailsImpl implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private long id;
+    //private long id;
 
-    private String name, email, phone;
+    //private String name, email, phone;
 
-    @JsonIgnore
-    private String password;
+    //@JsonIgnore
+    //private String password;
+
+    private User user;
 
     private Collection<? extends GrantedAuthority> authorities;
 
@@ -33,13 +35,11 @@ public class UserDetailsImpl implements UserDetails {
         return authorities;
     }
     @Override
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() {return user.getPassword();}
 
     @Override
     public String getUsername() {
-        return email;
+        return user.getEmail();
     }
 
     @Override
@@ -62,16 +62,11 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
+
     public static UserDetailsImpl build(User user){
         SimpleGrantedAuthority role = new SimpleGrantedAuthority(user.getRole().name());
         List<GrantedAuthority> authorities = List.of(role);
 
-        return new UserDetailsImpl(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getPhone(),
-                user.getPassword(),
-                authorities);
+        return new UserDetailsImpl(user, authorities);
     }
 }

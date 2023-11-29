@@ -28,12 +28,14 @@ public class UserService implements UserDetailsService {
         return UserDetailsImpl.build(user);
     }
 
-    public boolean existsByEmail(String email){
-        return userRepository.existsByEmail(email);
-    }
-
-    public boolean existsByPhone(String phone){
-        return userRepository.existsByPhone(phone);
+    public String getErrorMessageAboutExistPersonalData(String email, String phone){
+        if(userRepository.existsByEmail(email)){
+            return "Электронная почта уже используется!";
+        } else if(userRepository.existsByPhone(phone)){
+            return "Номер телефона уже используется!";
+        }else{
+            return null;
+        }
     }
 
     public void add(User user){
