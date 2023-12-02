@@ -22,10 +22,17 @@ public class TypeProductService {
     }
 
     public List<TypeProduct> findByPage(int page){
-
         int size = 7;
         Pageable pageable = PageRequest.of(page, size, Sort.by("type"));
+
         return typeProductRepository.findAll(pageable).getContent();
+    }
+
+    public List<TypeProduct> findByPage(int page, String type){
+        int size = 7;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("type"));
+
+        return typeProductRepository.findByTypeContainsIgnoreCase(pageable,type).getContent();
     }
 
     public Optional<TypeProduct> findById(long id){

@@ -2,15 +2,14 @@ package kafpinpin120.publishingHouse.controllers;
 
 import jakarta.validation.Valid;
 import kafpinpin120.publishingHouse.models.TypeProduct;
+import kafpinpin120.publishingHouse.payloads.HttpExceptionHandler;
 import kafpinpin120.publishingHouse.services.TypeProductService;
 import kafpinpin120.publishingHouse.services.ValidateInputService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,23 +22,26 @@ public class TypeProductController {
     private final TypeProductService typeProductService;
     private final ValidateInputService validateInputService;
 
-    public TypeProductController(TypeProductService typeProductService, ValidateInputService validateInputService) {
+    private final HttpExceptionHandler httpExceptionHandler;
+
+    public TypeProductController(TypeProductService typeProductService, ValidateInputService validateInputService, HttpExceptionHandler httpExceptionHandler) {
         this.typeProductService = typeProductService;
         this.validateInputService = validateInputService;
+        this.httpExceptionHandler = httpExceptionHandler;
     }
 
-
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<String> handleTypeMismatch() {
-        return new ResponseEntity<>("Некорректный параметр в запросе", HttpStatus.BAD_REQUEST);
-    }
 
     @GetMapping
-    public ResponseEntity<?> getByNumberPage(@RequestParam(name = "page") int page){
+    public ResponseEntity<?> get(@RequestParam(name = "page") int page, @RequestParam(name = "type",required = false) String type){
 
         List<TypeProduct> typeProducts;
         try{
-            typeProducts = typeProductService.findByPage(page);
+            if(type == null) {
+                typeProducts = typeProductService.findByPage(page);
+            } else{
+                typeProducts = typeProductService.findByPage(page,type);
+            }
+
         } catch (Exception e){
             return new ResponseEntity<>("Ошибка получения списка типов продукции", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -115,7 +117,7 @@ public class TypeProductController {
             return new ResponseEntity<>("Ошибка удаления типа продукции", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>("Тип продукции успешно удалён!", HttpStatus.OK);
+        return new ResponseEntity<>("Тип продукции успешно удалён!", HttpStatus.NO_CONTENT);
     }
 
 }

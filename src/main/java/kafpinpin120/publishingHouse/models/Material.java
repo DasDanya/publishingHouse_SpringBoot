@@ -1,5 +1,6 @@
 package kafpinpin120.publishingHouse.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -26,8 +27,8 @@ public class Material {
 
     @Column(nullable = false)
     @NotBlank(message = "Цвет материала не должен быть пустым")
-    @Size(min = 6, max = 15, message = "Длина наименования цвета материала не входит в диапазон от 6 до 15 символов")
-    @Pattern(regexp = "\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])%?\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])%?\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])%?\\s*$", message = "Цвет материала должен быть записан следующим образом: R;G;B")
+    @Size(min = 5, max = 15, message = "Длина наименования цвета материала не входит в диапазон от 5 до 15 символов")
+    @Pattern(regexp = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?);(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?);(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", message = "Цвет материала должен быть записан следующим образом: R;G;B")
     private String color;
 
     @Column(nullable = false)
@@ -43,6 +44,7 @@ public class Material {
     private BigDecimal cost;
 
     @OneToMany(mappedBy = "material", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<ProductMaterial> productMaterials;
 }
 
