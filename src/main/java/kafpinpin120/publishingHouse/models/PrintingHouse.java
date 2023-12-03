@@ -1,5 +1,6 @@
 package kafpinpin120.publishingHouse.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -56,10 +57,11 @@ public class PrintingHouse {
     @Column(nullable = false)
     @NotBlank
     @Size(max = 7, message = "Длина номера дома не входит в диапазон от 1 до 7 символов")
-    @Pattern(regexp = "^[1-9]\\d*(?: ?(?:[А-Га-г]|[/] ?\\d+))?$", message = "Некорректный ввод номера дома")
+    @Pattern(regexp = "^[0-9]+[А-Е]?(/[0-9]+)?$", message = "Некорректный ввод номера дома")
     private String house;
 
 
     @OneToMany(mappedBy = "printingHouse")
+    @JsonIgnore
     private List<Booking> bookings;
 }
