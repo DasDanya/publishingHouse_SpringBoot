@@ -17,24 +17,31 @@ public class TypeProductService {
 
     private final TypeProductRepository typeProductRepository;
 
+    private final int countItemsInPage = 7;
+
     public TypeProductService(TypeProductRepository typeProductRepository) {
         this.typeProductRepository = typeProductRepository;
     }
 
+    public List<TypeProduct> findAll(){
+        return (List<TypeProduct>) typeProductRepository.findAll(Sort.by("type"));
+    }
+
     public List<TypeProduct> findByPage(int page){
-        int size = 7;
-        Pageable pageable = PageRequest.of(page, size, Sort.by("type"));
+        Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("type"));
 
         return typeProductRepository.findAll(pageable).getContent();
     }
 
     public List<TypeProduct> findByPage(int page, String type){
-        int size = 7;
-        Pageable pageable = PageRequest.of(page, size, Sort.by("type"));
+        Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("type"));
 
         return typeProductRepository.findByTypeContainsIgnoreCase(pageable,type).getContent();
     }
 
+    public List<TypeProduct> findByType(String type) {
+        return typeProductRepository.findByTypeContainsIgnoreCase(type);
+    }
     public Optional<TypeProduct> findById(long id){
         return typeProductRepository.findById(id);
     }
@@ -46,5 +53,7 @@ public class TypeProductService {
     public void delete(long id){
         typeProductRepository.deleteById(id);
     }
+
+
 }
 

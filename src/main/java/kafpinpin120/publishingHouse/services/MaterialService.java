@@ -15,24 +15,23 @@ import java.util.Optional;
 public class MaterialService {
 
     private final MaterialRepository materialRepository;
-
+    private final int countItemsInPage = 7;
     public MaterialService(MaterialRepository materialRepository) {
         this.materialRepository = materialRepository;
     }
 
     public List<Material> findByPage(int page){
-        int size = 7;
-        Pageable pageable = PageRequest.of(page, size, Sort.by("type"));
+        Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("type"));
 
         return materialRepository.findAll(pageable).getContent();
     }
 
     public List<Material> findByPage(int page, String type){
-        int size = 7;
-        Pageable pageable = PageRequest.of(page,size, Sort.by("type"));
+        Pageable pageable = PageRequest.of(page,countItemsInPage, Sort.by("type"));
 
         return materialRepository.findByTypeContainsIgnoreCase(pageable,type).getContent();
     }
+
 
     public void save(Material material) {
         materialRepository.save(material);

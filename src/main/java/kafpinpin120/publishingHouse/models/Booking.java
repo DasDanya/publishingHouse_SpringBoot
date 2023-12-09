@@ -51,6 +51,10 @@ public class Booking {
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
     private List<BookingProduct> products;
 
-    @ManyToMany(mappedBy = "bookings")
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "bookings_employees",
+            joinColumns = @JoinColumn(name = "booking_id",nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "employee_id",nullable = false),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"employee_id", "booking_id"}))
     private List<Employee> employees;
 }

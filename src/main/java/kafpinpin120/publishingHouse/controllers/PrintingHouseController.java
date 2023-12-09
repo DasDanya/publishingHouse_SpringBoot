@@ -78,7 +78,7 @@ public class PrintingHouseController {
                 return new ResponseEntity<>("Типография не найдена", HttpStatus.BAD_REQUEST);
             }else{
                 if(!printingHouseInDb.get().getBookings().isEmpty()){
-                    return new ResponseEntity<>("Невозможно удалить типографию, так как она выполняет заказ",HttpStatus.CONFLICT);
+                    return new ResponseEntity<>("Невозможно удалить типографию, так как она связана с заказом",HttpStatus.CONFLICT);
                 }
 
                 printingHouseService.delete(id);

@@ -15,6 +15,8 @@ public class PrintingHouseService {
 
     private final PrintingHouseRepository printingHouseRepository;
 
+    private final int countItemsInPage = 7;
+
     public PrintingHouseService(PrintingHouseRepository printingHouseRepository) {
         this.printingHouseRepository = printingHouseRepository;
     }
@@ -24,15 +26,13 @@ public class PrintingHouseService {
     }
 
     public List<PrintingHouse> findByPage(int page) {
-        int size = 7;
-        Pageable pageable = PageRequest.of(page, size, Sort.by("name"));
+        Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("name"));
 
         return printingHouseRepository.findAll(pageable).getContent();
     }
 
     public List<PrintingHouse> findByPage(int page, String name){
-        int size = 7;
-        Pageable pageable = PageRequest.of(page, size, Sort.by("name"));
+        Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("name"));
 
         return printingHouseRepository.findByNameContainsIgnoreCase(pageable,name).getContent();
     }

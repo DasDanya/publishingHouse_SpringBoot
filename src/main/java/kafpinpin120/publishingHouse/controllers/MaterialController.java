@@ -44,6 +44,21 @@ public class MaterialController {
         return new ResponseEntity<>(materials, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable("id") long id){
+        Optional<Material> material;
+        try{
+            material = materialService.findById(id);
+            if(material.isEmpty()){
+                return new ResponseEntity<>("Материал не найден", HttpStatus.NOT_FOUND);
+            }
+        }catch (Exception e){
+            return new ResponseEntity<>("Ошибка получения материала", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(material.get(), HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid Material material, BindingResult bindingResult){
         try{

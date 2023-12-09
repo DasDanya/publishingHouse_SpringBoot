@@ -32,14 +32,22 @@ public class TypeProductController {
 
 
     @GetMapping
-    public ResponseEntity<?> get(@RequestParam(name = "page") int page, @RequestParam(name = "type",required = false) String type){
+    public ResponseEntity<?> get(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "type",required = false) String type){
 
         List<TypeProduct> typeProducts;
         try{
-            if(type == null) {
-                typeProducts = typeProductService.findByPage(page);
-            } else{
-                typeProducts = typeProductService.findByPage(page,type);
+            if(page == null){
+                if(type == null) {
+                    typeProducts = typeProductService.findAll();
+                }else{
+                    typeProducts = typeProductService.findByType(type);
+                }
+            }else {
+                if (type == null) {
+                    typeProducts = typeProductService.findByPage(page);
+                } else {
+                    typeProducts = typeProductService.findByPage(page, type);
+                }
             }
 
         } catch (Exception e){
