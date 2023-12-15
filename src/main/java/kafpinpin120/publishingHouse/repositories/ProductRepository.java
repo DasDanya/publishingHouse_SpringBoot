@@ -8,6 +8,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
@@ -18,7 +19,13 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
 
     Page<Product> findByUserId(Pageable pageable, int userId);
 
+    Optional<Product> findById(long id);
+
     List<Product> findByNameContainsIgnoreCase(String name);
+
+    void save(Product product);
+
+    void deleteById(long id);
 
 
 }

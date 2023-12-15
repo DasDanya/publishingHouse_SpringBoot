@@ -3,15 +3,16 @@ package kafpinpin120.publishingHouse.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 
 @Entity
 @Table(name = "typeProducts")
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class TypeProduct {
 

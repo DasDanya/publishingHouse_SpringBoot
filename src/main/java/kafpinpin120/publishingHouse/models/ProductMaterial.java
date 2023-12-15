@@ -4,11 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "productsMaterials", uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "material_id"}))
 public class ProductMaterial {
@@ -22,12 +25,18 @@ public class ProductMaterial {
     private int countMaterials;
 
     @ManyToOne
-    @NotEmpty
+    @NotNull
     @JoinColumn(name = "product_id",nullable = false)
     private Product product;
 
     @ManyToOne
-    @NotEmpty
+    @NotNull
     @JoinColumn(name="material_id",nullable = false)
     private Material material;
+
+    public ProductMaterial(int countMaterials, Product product, Material material) {
+        this.countMaterials = countMaterials;
+        this.product = product;
+        this.material = material;
+    }
 }

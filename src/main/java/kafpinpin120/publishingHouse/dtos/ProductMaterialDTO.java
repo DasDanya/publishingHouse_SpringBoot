@@ -1,5 +1,6 @@
 package kafpinpin120.publishingHouse.dtos;
 
+import kafpinpin120.publishingHouse.models.Material;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductMaterialDTO {
-    private long materialId;
+    private Material material;
     private int countMaterials;
 }

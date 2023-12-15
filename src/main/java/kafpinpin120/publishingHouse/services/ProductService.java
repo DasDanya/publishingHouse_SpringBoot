@@ -1,94 +1,242 @@
 package kafpinpin120.publishingHouse.services;
 
-import kafpinpin120.publishingHouse.dtos.ProductDTO;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import kafpinpin120.publishingHouse.dtos.CountProductsDTO;
+import kafpinpin120.publishingHouse.dtos.ProductAcceptDTO;
 import kafpinpin120.publishingHouse.dtos.ProductMaterialDTO;
-import kafpinpin120.publishingHouse.models.PhotoProduct;
-import kafpinpin120.publishingHouse.models.Product;
-import kafpinpin120.publishingHouse.models.ProductMaterial;
+import kafpinpin120.publishingHouse.dtos.ProductSendDTO;
+import kafpinpin120.publishingHouse.exceptions.FileIsNotImageException;
+import kafpinpin120.publishingHouse.models.*;
+import kafpinpin120.publishingHouse.repositories.PhotoProductRepository;
+import kafpinpin120.publishingHouse.repositories.ProductMaterialRepository;
 import kafpinpin120.publishingHouse.repositories.ProductRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
 
+    private final ProductMaterialRepository productMaterialRepository;
+
+    private final PhotoProductRepository photoProductRepository;
+
     private final FilesService filesService;
+
+    private final UserService userService;
+
+    private final BookingService bookingService;
 
     private final int countItemsInPage = 7;
 
-    public ProductService(ProductRepository productRepository, FilesService filesService) {
+    public ProductService(ProductRepository productRepository, ProductMaterialRepository productMaterialRepository, PhotoProductRepository photoProductRepository, FilesService filesService, UserService userService, BookingService bookingService) {
         this.productRepository = productRepository;
+        this.productMaterialRepository = productMaterialRepository;
+        this.photoProductRepository = photoProductRepository;
         this.filesService = filesService;
+        this.userService = userService;
+        this.bookingService = bookingService;
     }
 
-    private List<ProductDTO> getListDTOS(List<Product> products) throws IOException {
-        List<ProductDTO> productDTOS = new ArrayList<>();
+    private List<ProductSendDTO> getListSendDTOS(List<Product> products) throws IOException {
+        List<ProductSendDTO> productSendDTOS = new ArrayList<>();
 
         for(Product product: products){
-
-            List<byte[]> productPhotos = new ArrayList<>();
-            for(PhotoProduct photoProduct: product.getPhotos()){
-                productPhotos.add(filesService.getFile(photoProduct.getPath()));
-            }
-
-            List<ProductMaterialDTO> productMaterialDTOS = new ArrayList<>();
-            for(ProductMaterial productMaterial: product.getMaterialsWithCount()){
-                productMaterialDTOS.add(new ProductMaterialDTO(productMaterial.getMaterial().getId(), productMaterial.getCountMaterials()));
-            }
-
-            ProductDTO productDTO = new ProductDTO(product.getId(), product.getUser().getId(), product.getTypeProduct().getId(), product.getName(), product.getCost(),productMaterialDTOS, productPhotos);
-            productDTOS.add(productDTO);
+            productSendDTOS.add(getSendDTO(product,true));
         }
 
-        return productDTOS;
+        return productSendDTOS;
+    }
+
+    private ProductSendDTO getSendDTO(Product product, boolean shortVersion) throws IOException {
+
+        List<byte[]> productPhotos = new ArrayList<>();
+        for(PhotoProduct photoProduct: product.getPhotos()){
+            productPhotos.add(filesService.getFile(photoProduct.getPath()));
+        }
+
+        if(shortVersion){
+            return new ProductSendDTO(product.getId(), product.getName(), product.getUser().getName(), product.getUser().getEmail(), product.getCost(), product.getTypeProduct(), null, null, productPhotos);
+        }
+
+
+
+        List<ProductMaterialDTO> productMaterialDTOS = new ArrayList<>();
+        for(ProductMaterial productMaterial: product.getMaterialsWithCount()){
+            productMaterialDTOS.add(new ProductMaterialDTO(productMaterial.getMaterial(), productMaterial.getCountMaterials()));
+        }
+
+        List<CountProductsDTO> countProductsDTOS = new ArrayList<>();
+        for(BookingProduct bookingProduct: product.getBookings()){
+            CountProductsDTO countProductsDTO = new CountProductsDTO(bookingService.getBookingSimpleSendDTO(bookingProduct.getBooking()), bookingProduct.getEdition());
+            countProductsDTOS.add(countProductsDTO);
+        }
+
+        return new ProductSendDTO(product.getId(), product.getName(), product.getUser().getName(), product.getUser().getEmail(), product.getCost(), product.getTypeProduct(), productMaterialDTOS, countProductsDTOS, productPhotos);
     }
 
 
-    public List<ProductDTO> findAll() throws IOException {
+    public List<ProductSendDTO> findAll() throws IOException {
         List<Product> products = (List<Product>) productRepository.findAll(Sort.by("name"));
 
-        return getListDTOS(products);
+        return getListSendDTOS(products);
     }
 
-    public List<ProductDTO> findByName(String name) throws IOException {
+    public List<ProductSendDTO> findByName(String name) throws IOException {
         List<Product> products = productRepository.findByNameContainsIgnoreCase(name);
 
-        return getListDTOS(products);
+        return getListSendDTOS(products);
     }
 
-    public List<ProductDTO> findByPage(int page) throws IOException {
+    public List<ProductSendDTO> findByPage(int page) throws IOException {
         Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("name"));
         List<Product> products = productRepository.findAll(pageable).getContent();
 
-        return getListDTOS(products);
+        return getListSendDTOS(products);
     }
 
-    public List<ProductDTO> findByPage(int page, String name) throws IOException {
+    public List<ProductSendDTO> findByPage(int page, String name) throws IOException {
         Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("name"));
         List<Product> products = productRepository.findByNameContainsIgnoreCase(pageable, name).getContent();
 
-        return getListDTOS(products);
+        return getListSendDTOS(products);
     }
 
-    public List<ProductDTO> findByPage(int page, int userId) throws IOException {
+    public List<ProductSendDTO> findByPage(int page, int userId) throws IOException {
         Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("name"));
         List<Product> products = productRepository.findByUserId(pageable, userId).getContent();
 
-        return getListDTOS(products);
+        return getListSendDTOS(products);
     }
 
-    public List<ProductDTO> findByPage(int page, int userId, String name) throws IOException {
+    public List<ProductSendDTO> findByPage(int page, int userId, String name) throws IOException {
         Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("name"));
         List<Product> products = productRepository.findByNameContainsIgnoreCaseAndUserId(pageable, name,userId).getContent();
 
-        return getListDTOS(products);
+        return getListSendDTOS(products);
+    }
+
+    public ProductSendDTO findByIdSendDTO(long id) throws IOException {
+        Optional<Product> product = productRepository.findById(id);
+        if(product.isEmpty()){
+            throw new EntityNotFoundException("Продукция не найдена");
+        }else{
+            return getSendDTO(product.get(), false);
+        }
+    }
+
+    public Optional<Product> findById(long id){
+        return productRepository.findById(id);
+    }
+
+
+
+    public void add(ProductAcceptDTO productAcceptDTO, List<MultipartFile> photos) throws IOException {
+        Product product = new Product();
+        product.setId(productAcceptDTO.getId());
+        product.setName(productAcceptDTO.getName());
+        product.setCost(productAcceptDTO.getCost());
+        product.setTypeProduct(productAcceptDTO.getTypeProduct());
+
+        //Optional<User> user = userService.findById(productAcceptDTO.getUserId());
+        //user.ifPresent(product::setUser);
+        setUser(product, productAcceptDTO.getUserId());
+        setMaterialsWithCount(product, productAcceptDTO.getProductMaterialDTOS());
+        setPhotos(product, photos);
+
+//        product.setMaterialsWithCount(new ArrayList<>());
+//        for(ProductMaterialDTO productMaterialDTO: productAcceptDTO.getProductMaterialDTOS()){
+//            product.getMaterialsWithCount().add(new ProductMaterial(productMaterialDTO.getCountMaterials(), product, productMaterialDTO.getMaterial()));
+//        }
+
+        try {
+            productRepository.save(product);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void setUser(Product product, long userId){
+        Optional<User> user = userService.findById(userId);
+        user.ifPresent(product::setUser);
+    }
+
+    private void setMaterialsWithCount(Product product, List<ProductMaterialDTO> productMaterialDTOS){
+        product.setMaterialsWithCount(new ArrayList<>());
+        for(ProductMaterialDTO productMaterialDTO: productMaterialDTOS){
+            product.getMaterialsWithCount().add(new ProductMaterial(productMaterialDTO.getCountMaterials(), product, productMaterialDTO.getMaterial()));
+        }
+    }
+
+    private void setPhotos(Product product, List<MultipartFile> photos) throws IOException {
+        Random random = new Random();
+        product.setPhotos(new ArrayList<>());
+        for(MultipartFile photo: photos){
+            if(!filesService.isImage(photo)){
+                throw new FileIsNotImageException("Файл не является изображением");
+            }else{
+                String photoNewName = product.getName() + random.nextInt(10000000) + photo.getOriginalFilename().substring(photo.getOriginalFilename().lastIndexOf('.'));
+                String destinationPath = "src/main/resources/static/images/products/" + photoNewName;
+                filesService.saveImage(photo, destinationPath);
+
+                PhotoProduct photoProduct = new PhotoProduct(destinationPath, product);
+                product.getPhotos().add(photoProduct);
+            }
+        }
+    }
+
+
+
+    @Transactional
+    public void update(Product product,ProductAcceptDTO productAcceptDTO, List<MultipartFile> photos) throws IOException {
+        product.setName(productAcceptDTO.getName());
+        product.setCost(productAcceptDTO.getCost());
+        product.setTypeProduct(productAcceptDTO.getTypeProduct());
+
+        try {
+
+        for(PhotoProduct photoProduct: product.getPhotos()){
+            filesService.deleteFile(photoProduct.getPath());
+        }
+
+        product.getPhotos().clear();
+        product.getBookings().clear();
+        productMaterialRepository.deleteByProductId(product.getId());
+        photoProductRepository.deleteByProductId(product.getId());
+
+        setUser(product, productAcceptDTO.getUserId());
+        setMaterialsWithCount(product, productAcceptDTO.getProductMaterialDTOS());
+        setPhotos(product, photos);
+
+
+        productRepository.save(product);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void delete(Product product) throws IOException {
+        List<String> pathsToFiles = new ArrayList<>();
+        for(PhotoProduct photoProduct: product.getPhotos()){
+            pathsToFiles.add(photoProduct.getPath());
+        }
+
+        productRepository.deleteById(product.getId());
+
+        for(String path: pathsToFiles){
+            filesService.deleteFile(path);
+        }
     }
 }

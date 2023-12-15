@@ -2,17 +2,19 @@ package kafpinpin120.publishingHouse.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class User {
 
@@ -47,7 +49,7 @@ public class User {
     private UserRole role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore // для теста поставил, надо будет убрать
+    @JsonIgnore
     private List<Product> products;
 
     public User(String name, String phone, String email, String password, UserRole role) {

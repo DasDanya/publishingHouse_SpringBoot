@@ -20,6 +20,10 @@ public class MaterialService {
         this.materialRepository = materialRepository;
     }
 
+    public List<Material> findAll(){
+        return (List<Material>) materialRepository.findAll(Sort.by("type"));
+    }
+
     public List<Material> findByPage(int page){
         Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("type"));
 

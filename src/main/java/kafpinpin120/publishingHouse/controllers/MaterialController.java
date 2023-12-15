@@ -28,14 +28,18 @@ public class MaterialController {
     }
 
     @GetMapping
-    public ResponseEntity<?> get(@RequestParam(name = "page") int page, @RequestParam(name = "type",required = false) String type){
+    public ResponseEntity<?> get(@RequestParam(name = "page",required = false) Integer page, @RequestParam(name = "type",required = false) String type){
         List<Material> materials;
 
         try{
-            if(type == null){
-                materials = materialService.findByPage(page);
+            if(page != null) {
+                if (type == null) {
+                    materials = materialService.findByPage(page);
+                } else {
+                    materials = materialService.findByPage(page, type);
+                }
             }else{
-                materials = materialService.findByPage(page, type);
+                materials = materialService.findAll();
             }
         }catch (Exception e){
             return new ResponseEntity<>("Ошибка получения списка материалов",HttpStatus.INTERNAL_SERVER_ERROR);

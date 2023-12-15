@@ -1,15 +1,16 @@
 package kafpinpin120.publishingHouse.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "products")
 public class Product {
@@ -30,21 +31,23 @@ public class Product {
     private BigDecimal cost;
 
     @ManyToOne
-    @NotEmpty
+    @NotNull
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @NotEmpty
+    @NotNull
     @JoinColumn(name="type_product_id", nullable = false)
     private TypeProduct typeProduct;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @NotNull
     private List<ProductMaterial> materialsWithCount;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product")
     private List<BookingProduct> bookings;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @NotNull
     private List<PhotoProduct> photos;
 }

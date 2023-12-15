@@ -3,12 +3,14 @@ package kafpinpin120.publishingHouse.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "photoProducts")
 public class PhotoProduct {
 
@@ -21,7 +23,12 @@ public class PhotoProduct {
     private String path;
 
     @ManyToOne
-    @NotEmpty
+    @NotNull
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    public PhotoProduct(String path, Product product) {
+        this.path = path;
+        this.product = product;
+    }
 }
