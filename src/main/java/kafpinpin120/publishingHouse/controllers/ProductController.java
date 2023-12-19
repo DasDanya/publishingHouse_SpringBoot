@@ -35,7 +35,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<?> get(@RequestParam(name = "userId", required = false) Integer userId, @RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "name", required = false) String name){
+    public ResponseEntity<?> get(@RequestParam(name = "userId", required = false) Long userId, @RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "name", required = false) String name){
 
         List<ProductSendDTO> productSendDTOS;
         try{
@@ -54,10 +54,14 @@ public class ProductController {
                     }
                 }
             }else{
-                if(name == null){
-                    productSendDTOS = productService.findByPage(page, userId);
+                if(page != null) {
+                    if (name == null) {
+                        productSendDTOS = productService.findByPage(page, userId);
+                    } else {
+                        productSendDTOS = productService.findByPage(page, userId, name);
+                    }
                 }else{
-                    productSendDTOS = productService.findByPage(page, userId,name);
+                    productSendDTOS = productService.findByUserId(userId);
                 }
             }
         }catch (Exception e){

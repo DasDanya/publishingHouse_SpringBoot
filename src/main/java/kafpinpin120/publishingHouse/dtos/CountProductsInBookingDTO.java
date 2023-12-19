@@ -7,8 +7,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Setter
 @Getter
-public class CountProductsDTO {
+public class CountProductsInBookingDTO {
 
     private BookingSimpleSendDTO booking;
-    private int margin;
+    private int edition;
 }

@@ -23,28 +23,23 @@ public class Booking {
     private long id;
 
     @Column(nullable = false)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd.MM.yyyy")
-    @JsonFormat(pattern = "dd.MM.yyyy")
     private LocalDate startExecution;
 
     @Future
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd.MM.yyyy")
-    @JsonFormat(pattern = "dd.MM.yyyy")
     private LocalDate endExecution;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private StatusOfBooking status;
+    @Size(max = 20)
+    private String status;
 
 
     @Column(nullable = false)
     @DecimalMin(value = "1", message = "1₽")
-    @DecimalMax(value = "1000000", message = "Максимальная стоимость материала = 1000000₽")
-    @Digits(integer = 7, fraction = 2, message = "Доступно 2 цифры после запятой. Длина целой части стоимости должна быть не более чем из 7 цифр")
+    @DecimalMax(value = "100000000", message = "Максимальная стоимость материала = 100000000₽")
+    @Digits(integer = 9, fraction = 2, message = "Доступно 2 цифры после запятой. Длина целой части стоимости должна быть не более чем из 7 цифр")
     private BigDecimal cost;
 
     @ManyToOne
-    @NotEmpty
     @JoinColumn(name = "printing_house_id")
     private PrintingHouse printingHouse;
 

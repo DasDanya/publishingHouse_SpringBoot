@@ -2,7 +2,7 @@ package kafpinpin120.publishingHouse.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import kafpinpin120.publishingHouse.dtos.CountProductsDTO;
+import kafpinpin120.publishingHouse.dtos.CountProductsInBookingDTO;
 import kafpinpin120.publishingHouse.dtos.ProductAcceptDTO;
 import kafpinpin120.publishingHouse.dtos.ProductMaterialDTO;
 import kafpinpin120.publishingHouse.dtos.ProductSendDTO;
@@ -77,19 +77,25 @@ public class ProductService {
             productMaterialDTOS.add(new ProductMaterialDTO(productMaterial.getMaterial(), productMaterial.getCountMaterials()));
         }
 
-        List<CountProductsDTO> countProductsDTOS = new ArrayList<>();
+        List<CountProductsInBookingDTO> countProductsInBookingDTOS = new ArrayList<>();
         for(BookingProduct bookingProduct: product.getBookings()){
-            CountProductsDTO countProductsDTO = new CountProductsDTO(bookingService.getBookingSimpleSendDTO(bookingProduct.getBooking()), bookingProduct.getEdition());
-            countProductsDTOS.add(countProductsDTO);
+            CountProductsInBookingDTO countProductsInBookingDTO = new CountProductsInBookingDTO(bookingService.getBookingSimpleSendDTO(bookingProduct.getBooking()), bookingProduct.getEdition());
+            countProductsInBookingDTOS.add(countProductsInBookingDTO);
         }
 
-        return new ProductSendDTO(product.getId(), product.getName(), product.getUser().getName(), product.getUser().getEmail(), product.getCost(), product.getTypeProduct(), productMaterialDTOS, countProductsDTOS, productPhotos);
+        return new ProductSendDTO(product.getId(), product.getName(), product.getUser().getName(), product.getUser().getEmail(), product.getCost(), product.getTypeProduct(), productMaterialDTOS, countProductsInBookingDTOS, productPhotos);
     }
 
 
     public List<ProductSendDTO> findAll() throws IOException {
         List<Product> products = (List<Product>) productRepository.findAll(Sort.by("name"));
 
+        return getListSendDTOS(products);
+    }
+
+
+    public List<ProductSendDTO> findByUserId(long userId) throws IOException {
+        List<Product> products = productRepository.findByUserIdOrderByNameAsc(userId);
         return getListSendDTOS(products);
     }
 
@@ -113,14 +119,14 @@ public class ProductService {
         return getListSendDTOS(products);
     }
 
-    public List<ProductSendDTO> findByPage(int page, int userId) throws IOException {
+    public List<ProductSendDTO> findByPage(int page, long userId) throws IOException {
         Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("name"));
         List<Product> products = productRepository.findByUserId(pageable, userId).getContent();
 
         return getListSendDTOS(products);
     }
 
-    public List<ProductSendDTO> findByPage(int page, int userId, String name) throws IOException {
+    public List<ProductSendDTO> findByPage(int page, long userId, String name) throws IOException {
         Pageable pageable = PageRequest.of(page, countItemsInPage, Sort.by("name"));
         List<Product> products = productRepository.findByNameContainsIgnoreCaseAndUserId(pageable, name,userId).getContent();
 
@@ -160,11 +166,11 @@ public class ProductService {
 //            product.getMaterialsWithCount().add(new ProductMaterial(productMaterialDTO.getCountMaterials(), product, productMaterialDTO.getMaterial()));
 //        }
 
-        try {
+       // try {
             productRepository.save(product);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        //} catch (Exception e){
+            //e.printStackTrace();
+        //}
     }
 
     private void setUser(Product product, long userId){

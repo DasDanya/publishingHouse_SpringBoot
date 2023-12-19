@@ -15,9 +15,11 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
 
     Page<Product> findByNameContainsIgnoreCase(Pageable pageable, String name);
 
-    Page<Product> findByNameContainsIgnoreCaseAndUserId(Pageable pageable, String name, int userId);
+    Page<Product> findByNameContainsIgnoreCaseAndUserId(Pageable pageable, String name, long userId);
 
-    Page<Product> findByUserId(Pageable pageable, int userId);
+    Page<Product> findByUserId(Pageable pageable, long userId);
+
+    List<Product> findByUserIdOrderByNameAsc(long userId);
 
     Optional<Product> findById(long id);
 

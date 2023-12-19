@@ -26,7 +26,7 @@ public class Product {
 
     @Column(nullable = false)
     @DecimalMin(value = "1", message = "1₽")
-    @DecimalMax(value = "100000", message = "Максимальная стоимость материала = 100000₽")
+    @DecimalMax(value = "100000", message = "Максимальная стоимость продукции = 100000₽")
     @Digits(integer = 6, fraction = 2, message = "Доступно 2 цифры после запятой. Длина целой части стоимости должна быть не более чем из 6 цифр")
     private BigDecimal cost;
 

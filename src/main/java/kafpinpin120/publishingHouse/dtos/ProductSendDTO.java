@@ -25,7 +25,7 @@ public class ProductSendDTO {
 
     List<ProductMaterialDTO> productMaterialDTOS;
 
-    List<CountProductsDTO> countProductsDTOS;
+    List<CountProductsInBookingDTO> countProductsInBookingDTOS;
 
     List<byte[]> photos;
 }
