@@ -2,6 +2,7 @@ package kafpinpin120.publishingHouse.dtos;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import kafpinpin120.publishingHouse.models.Employee;
 import kafpinpin120.publishingHouse.models.PrintingHouse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +26,6 @@ public class BookingAcceptDTO {
 
     private LocalDate startExecution;
 
-    @Future
     private LocalDate endExecution;
 
     @DecimalMin(value = "1", message = "1₽")
@@ -36,7 +36,6 @@ public class BookingAcceptDTO {
     @Valid
     private PrintingHouse printingHouse;
 
-    @NotNull
     private List<ProductWithEditionDTO> productsWithMargin;
 
     private List<Long> idsOfEmployees;

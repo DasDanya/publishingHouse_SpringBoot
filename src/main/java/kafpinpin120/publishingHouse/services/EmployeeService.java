@@ -40,7 +40,13 @@ public class EmployeeService {
         return getListDTOS(employees);
     }
 
-    private List<EmployeeDTO> getListDTOS(List<Employee> employees) throws IOException {
+    public List<EmployeeDTO> findAll() throws IOException {
+        List<Employee> employees = (List<Employee>) employeeRepository.findAll(Sort.by("surname"));
+
+        return getListDTOS(employees);
+    }
+
+    public List<EmployeeDTO> getListDTOS(List<Employee> employees) throws IOException {
         List<EmployeeDTO> employeeDTOS = new ArrayList<>();
 
         for(Employee employee: employees){
@@ -85,4 +91,5 @@ public class EmployeeService {
         employeeRepository.deleteById(employee.getId());
         filesService.deleteFile(pathToImage);
     }
+
 }

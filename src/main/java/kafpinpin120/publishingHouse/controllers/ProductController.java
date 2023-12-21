@@ -155,7 +155,7 @@ public class ProductController {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
 
-            return new ResponseEntity<>("Ошибка добавления продукции", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Ошибка изменения данных о продукции", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>("Данные о продукции успешно изменены", HttpStatus.OK);

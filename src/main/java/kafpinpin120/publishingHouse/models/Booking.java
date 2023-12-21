@@ -25,7 +25,7 @@ public class Booking {
     @Column(nullable = false)
     private LocalDate startExecution;
 
-    @Future
+
     private LocalDate endExecution;
 
     @Column(nullable = false)

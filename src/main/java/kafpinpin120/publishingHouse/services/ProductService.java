@@ -2,10 +2,7 @@ package kafpinpin120.publishingHouse.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import kafpinpin120.publishingHouse.dtos.CountProductsInBookingDTO;
-import kafpinpin120.publishingHouse.dtos.ProductAcceptDTO;
-import kafpinpin120.publishingHouse.dtos.ProductMaterialDTO;
-import kafpinpin120.publishingHouse.dtos.ProductSendDTO;
+import kafpinpin120.publishingHouse.dtos.*;
 import kafpinpin120.publishingHouse.exceptions.FileIsNotImageException;
 import kafpinpin120.publishingHouse.models.*;
 import kafpinpin120.publishingHouse.repositories.PhotoProductRepository;
@@ -18,10 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -47,6 +42,21 @@ public class ProductService {
         this.filesService = filesService;
         this.userService = userService;
         this.bookingService = bookingService;
+    }
+
+    public List<ProductSimpleSendDTO> getListSimpleSendDTOS(List<BookingProduct> bookingProducts) throws IOException {
+        List<ProductSimpleSendDTO> productSendDTOS = new ArrayList<>();
+
+        for(BookingProduct bookingProduct: bookingProducts){
+            Product product = bookingProduct.getProduct();
+
+            ProductSimpleSendDTO productSimpleSendDTO = new ProductSimpleSendDTO(product.getId(),product.getName(),product.getUser().getName(), bookingProduct.getEdition(),product.getCost(), filesService.getFile(product.getPhotos().get(0).getPath()));
+            productSendDTOS.add(productSimpleSendDTO);
+        }
+
+        return productSendDTOS.stream()
+                .sorted(Comparator.comparing(ProductSimpleSendDTO::getName))
+                .collect(Collectors.toList());
     }
 
     private List<ProductSendDTO> getListSendDTOS(List<Product> products) throws IOException {
@@ -82,6 +92,11 @@ public class ProductService {
             CountProductsInBookingDTO countProductsInBookingDTO = new CountProductsInBookingDTO(bookingService.getBookingSimpleSendDTO(bookingProduct.getBooking()), bookingProduct.getEdition());
             countProductsInBookingDTOS.add(countProductsInBookingDTO);
         }
+
+        countProductsInBookingDTOS = countProductsInBookingDTOS.stream()
+                .sorted(Comparator.comparing((CountProductsInBookingDTO dto) -> dto.getBooking().getId()).reversed())
+                .collect(Collectors.toList());
+
 
         return new ProductSendDTO(product.getId(), product.getName(), product.getUser().getName(), product.getUser().getEmail(), product.getCost(), product.getTypeProduct(), productMaterialDTOS, countProductsInBookingDTOS, productPhotos);
     }

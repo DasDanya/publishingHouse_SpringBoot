@@ -37,6 +37,10 @@ public class PrintingHouseService {
         return printingHouseRepository.findByNameContainsIgnoreCase(pageable,name).getContent();
     }
 
+    public List<PrintingHouse> findAll() {
+        return (List<PrintingHouse>) printingHouseRepository.findAll(Sort.by("name"));
+    }
+
     public Optional<PrintingHouse> findById(long id){
         return printingHouseRepository.findById(id);
     }
@@ -44,4 +48,6 @@ public class PrintingHouseService {
     public void delete(long id){
         printingHouseRepository.deleteById(id);
     }
+
+
 }

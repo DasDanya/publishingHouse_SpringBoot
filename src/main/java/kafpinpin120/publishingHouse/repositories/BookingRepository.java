@@ -16,4 +16,6 @@ public interface BookingRepository extends PagingAndSortingRepository<Booking, L
     Optional<Booking> findById(long id);
 
     Page<Booking> findByStatusContainsIgnoreCase(Pageable pageable, String status);
+
+    void delete(Booking booking);
 }

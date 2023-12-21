@@ -33,14 +33,18 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<?> get(@RequestParam(name = "page") int page, @RequestParam(name = "surname", required = false) String surname){
+    public ResponseEntity<?> get(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "surname", required = false) String surname){
         List<EmployeeDTO> employees;
 
         try{
-            if(surname == null){
-                employees = employeeService.findByPage(page);
-            }else{
-                employees = employeeService.findByPage(page,surname);
+            if(page != null) {
+                if (surname == null) {
+                    employees = employeeService.findByPage(page);
+                } else {
+                    employees = employeeService.findByPage(page, surname);
+                }
+            } else{
+                employees = employeeService.findAll();
             }
         }catch (Exception e){
             return new ResponseEntity<>("Ошибка получения списка сотрудников", HttpStatus.INTERNAL_SERVER_ERROR);

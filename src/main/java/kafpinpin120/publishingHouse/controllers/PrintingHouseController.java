@@ -27,14 +27,17 @@ public class PrintingHouseController {
     }
 
     @GetMapping
-    public ResponseEntity<?> get(@RequestParam(name = "page") int page, @RequestParam(name = "name", required = false) String name){
+    public ResponseEntity<?> get(@RequestParam(name = "page", required = false) Integer page, @RequestParam(name = "name", required = false) String name){
         List<PrintingHouse> printingHouses;
-
         try{
-            if(name == null){
-                printingHouses = printingHouseService.findByPage(page);
-            }else{
-                printingHouses = printingHouseService.findByPage(page, name);
+            if(page != null) {
+                if (name == null) {
+                    printingHouses = printingHouseService.findByPage(page);
+                } else {
+                    printingHouses = printingHouseService.findByPage(page, name);
+                }
+            } else{
+                printingHouses = printingHouseService.findAll();
             }
         }catch (Exception e){
             return new ResponseEntity<>("Ошибка получения списка типографий", HttpStatus.INTERNAL_SERVER_ERROR);
