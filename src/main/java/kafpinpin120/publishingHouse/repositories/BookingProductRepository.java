@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -21,5 +22,6 @@ public interface BookingProductRepository extends PagingAndSortingRepository<Boo
     List<BookingProduct> findByProductUserId(long userId);
     List<BookingProduct> findByProductUserIdAndBookingStatusContainsIgnoreCase(long userId, String status);
 
+    List<BookingProduct> findByProductUserIdAndBookingStatusContainsIgnoreCaseAndBookingEndExecutionBetween(long userId, String status, LocalDate startDate, LocalDate endDate);
     void deleteByBookingId(long bookingId);
 }

@@ -5,7 +5,9 @@ import jakarta.validation.Valid;
 import kafpinpin120.publishingHouse.dtos.BookingAcceptDTO;
 import kafpinpin120.publishingHouse.dtos.BookingSendDTO;
 import kafpinpin120.publishingHouse.dtos.BookingSimpleSendDTO;
+import kafpinpin120.publishingHouse.exceptions.DataNotFoundException;
 import kafpinpin120.publishingHouse.models.Booking;
+import kafpinpin120.publishingHouse.payloads.requests.GenerateReportRequest;
 import kafpinpin120.publishingHouse.services.BookingService;
 import kafpinpin120.publishingHouse.services.ValidateInputService;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,7 +98,7 @@ public class BookingController {
 
 
     @PutMapping("update/{id}")
-    public ResponseEntity<String> update(@RequestBody @Valid BookingAcceptDTO booking, BindingResult bindingResult, @PathVariable("id") long id, @RequestParam(name="admin") boolean admin){
+    public ResponseEntity<String> update(@RequestBody @Valid BookingAcceptDTO booking, BindingResult bindingResult, @PathVariable("id") long id, @RequestParam(name="updateStatus") String updateStatus){
         try{
             Optional<Booking> bookingInDb = bookingService.findById(id);
             if(bookingInDb.isEmpty()){
@@ -114,10 +117,10 @@ public class BookingController {
                     return new ResponseEntity<>(validateInputService.getErrors(bindingResult), HttpStatus.BAD_REQUEST);
                 }
 
-                if(!admin) {
+                if(updateStatus.equals("userUpdate")) {
                     bookingService.update(existBooking, booking);
                 }else{
-                    bookingService.updateAdmin(existBooking, booking);
+                    bookingService.updateAdmin(existBooking, booking,updateStatus);
                 }
             }
         } catch (Exception e){
@@ -125,5 +128,25 @@ public class BookingController {
         }
 
         return new ResponseEntity<>("Данные о заказе успешно изменены!", HttpStatus.OK);
+    }
+
+    @PostMapping("/generateReport")
+    public ResponseEntity<?> generateReport(@RequestBody @Valid GenerateReportRequest generateReportRequest, BindingResult bindingResult){
+        try{
+            if(bindingResult.hasErrors()){
+                return new ResponseEntity<>(validateInputService.getErrors(bindingResult), HttpStatus.BAD_REQUEST);
+            }
+
+            bookingService.generateReport(generateReportRequest);
+
+        }catch (Exception e){
+            if(e instanceof DataNotFoundException){
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<>("Ошибка генерации отчёта", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>("Отчёт успешно сгенерирован!", HttpStatus.OK);
     }
 }

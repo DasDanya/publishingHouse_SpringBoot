@@ -2,16 +2,12 @@ package kafpinpin120.publishingHouse.services;
 
 
 import jakarta.transaction.Transactional;
-import kafpinpin120.publishingHouse.models.Booking;
 import kafpinpin120.publishingHouse.models.BookingProduct;
-import kafpinpin120.publishingHouse.models.Product;
 import kafpinpin120.publishingHouse.repositories.BookingProductRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,23 +44,45 @@ public class BookingProductService {
 //                .toList();
 //    }
 
-        public List<BookingProduct> getUserBookings(int page, long userId){
+    public List<BookingProduct> getUserBookingsProducts(int page, long userId){
         List<BookingProduct> bookingProducts = bookingProductRepository.findByProductUserId(userId);
 
         return getPagedBookingProducts(bookingProducts, page);
     }
 
-    public List<BookingProduct> getUserBookings(int page, long userId, String status){
+    public List<BookingProduct> getUserBookingsProducts(int page, long userId, String status){
         List<BookingProduct> bookingProducts = bookingProductRepository.findByProductUserIdAndBookingStatusContainsIgnoreCase(userId,status);
 
         return getPagedBookingProducts(bookingProducts, page);
     }
 
+    public List<BookingProduct> getUserBookingsProducts(long userId){
+        List<BookingProduct> bookingProducts = bookingProductRepository.findByProductUserId(userId);
+
+        return getUniqueBookingProducts(bookingProducts);
+    }
+
+    public List<BookingProduct> getUserBookingsProductsBetweenData(long userId, String status, LocalDate startDate, LocalDate endDate){
+        List<BookingProduct> bookingProducts = bookingProductRepository.findByProductUserIdAndBookingStatusContainsIgnoreCaseAndBookingEndExecutionBetween(userId,status,startDate, endDate);
+
+        return getUniqueBookingProducts(bookingProducts);
+    }
+
+    private List<BookingProduct> getUniqueBookingProducts(List<BookingProduct> bookingProducts){
+       return bookingProducts.stream()
+               .filter(distinctByKey(bp -> bp.getBooking().getId()))
+               .sorted((bp1, bp2) -> Long.compare(bp2.getBooking().getId(), bp1.getBooking().getId()))
+               .toList();
+    }
+
+
     private List<BookingProduct> getPagedBookingProducts(List<BookingProduct> bookingProducts, int page){
-        List<BookingProduct> uniqueByBookingId = bookingProducts.stream()
-                .filter(distinctByKey(bp -> bp.getBooking().getId()))
-                .sorted((bp1, bp2) -> Long.compare(bp2.getBooking().getId(), bp1.getBooking().getId()))
-                .toList();
+//        List<BookingProduct> uniqueByBookingId = bookingProducts.stream()
+//                .filter(distinctByKey(bp -> bp.getBooking().getId()))
+//                .sorted((bp1, bp2) -> Long.compare(bp2.getBooking().getId(), bp1.getBooking().getId()))
+//                .toList();
+
+        List<BookingProduct> uniqueByBookingId = getUniqueBookingProducts(bookingProducts);
 
         int startIndex = page * countItemsInPage;
         int endIndex = startIndex + countItemsInPage;

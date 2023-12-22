@@ -33,7 +33,7 @@ public class BookingAcceptDTO {
     @Digits(integer = 9, fraction = 2, message = "Доступно 2 цифры после запятой. Длина целой части стоимости должна быть не более чем из 7 цифр")
     private BigDecimal cost;
 
-    @Valid
+
     private PrintingHouse printingHouse;
 
     private List<ProductWithEditionDTO> productsWithMargin;

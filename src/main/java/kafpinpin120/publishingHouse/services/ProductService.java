@@ -44,6 +44,19 @@ public class ProductService {
         this.bookingService = bookingService;
     }
 
+    public List<ProductSimpleSendDTO> getListSimpleSendDTOSForUser(List<Product> products) throws IOException {
+        List<ProductSimpleSendDTO> productSimpleSendDTOS = new ArrayList<>();
+
+        for(Product product: products){
+            ProductSimpleSendDTO productSimpleSendDTO = new ProductSimpleSendDTO(product.getId(), product.getName(), product.getUser().getName(), 0, product.getCost(), filesService.getFile(product.getPhotos().get(0).getPath()));
+            productSimpleSendDTOS.add(productSimpleSendDTO);
+        }
+
+        return productSimpleSendDTOS.stream()
+                .sorted(Comparator.comparing(ProductSimpleSendDTO::getName))
+                .collect(Collectors.toList());
+    }
+
     public List<ProductSimpleSendDTO> getListSimpleSendDTOS(List<BookingProduct> bookingProducts) throws IOException {
         List<ProductSimpleSendDTO> productSendDTOS = new ArrayList<>();
 
