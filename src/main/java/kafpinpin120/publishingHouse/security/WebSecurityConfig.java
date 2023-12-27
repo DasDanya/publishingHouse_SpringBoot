@@ -57,13 +57,20 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http.csrf(csrf->csrf.disable())
-                .exceptionHandling(exception-> exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth->
-                        auth.requestMatchers("/api/auth/**").permitAll()
-                                .anyRequest()
-                                .authenticated());
+            http.csrf(csrf->csrf.disable())
+                    .exceptionHandling(exception-> exception.authenticationEntryPoint(unauthorizedHandler))
+                    .sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(auth->
+                            auth.requestMatchers("/api/auth/**").permitAll()
+                                    .requestMatchers("/api/users/**").hasAnyAuthority("ADMINISTRATOR")
+                                    .requestMatchers("/api/typeProducts/add/**", "/api/typeProducts/update/**", "/api/typeProducts/delete/**").hasAnyAuthority("ADMINISTRATOR")
+                                    .requestMatchers("/api/products/add/**", "/api/products/update/**", "/api/products/delete/**").hasAnyAuthority("CUSTOMER")
+                                    .requestMatchers("/api/printingHouses/**").hasAnyAuthority("ADMINISTRATOR")
+                                    .requestMatchers("/api/materials/add/**", "/api/materials/update/**", "/api/materials/delete/**").hasAnyAuthority("ADMINISTRATOR")
+                                    .requestMatchers("/api/employees/**").hasAnyAuthority("ADMINISTRATOR")
+                                    .requestMatchers("/api/bookings/add/**", "/api/bookings/delete/**").hasAnyAuthority("CUSTOMER")
+                                    .anyRequest()
+                                    .authenticated());
 
         http.authenticationProvider(authenticationProvider());
 
